@@ -1,8 +1,9 @@
 # 🅛🅣🅧 MSR IC-LoRA FLF (Standalone)
 
-**Version:** 0.9.4
+**Version:** 0.9.5
 
 ## 📝 Changelog
+* **v0.9.5:** Fixed a critical bug in temporal coordinate alignment for the MSR video sequence. Previously, MSR video latents were dropped during conditioning, causing the temporal grid (RoPE) to shift backward into the main generated video. This resulted in broken motion at the end of the video and the failure of the `lock_last_frame` mechanism. The latents are now physically appended to maintain exact temporal synchronization, ensuring perfectly smooth motion and reliable frame locking up to the very last frame.
 * **v0.9.4:** Complete architectural overhaul based on the dual-chain method demonstrated in [this video](https://www.youtube.com/watch?v=uirABckAK4o&). The node now fundamentally separates MSR processing into two isolated streams:
   1. **Cross-Attention Stream:** MSR images are assembled into a full video sequence (acting like `Licon-MSR`) and processed via IC-LoRA to extract ONLY conditioning metadata. This provides character/style consistency without overwriting physical frames.
   2. **Latent Injection Stream:** Individual MSR images, alongside the First and Last frames, are injected directly into the physical latent space at their precise indices (index `0` for MSR/First Frame, and the end index for Last Frame) using logic adapted from `LTXVAddGuideMulti`.
