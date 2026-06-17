@@ -3,8 +3,9 @@
 **Version:** 0.9.4
 
 ## 📝 Changelog
-* **v0.9.4:** Fixed the `ValueError: guide pre_filter_counts != keyframe grid mask length` crash. The node now correctly injects `keyframe_idxs` for the MSR video into the conditioning, utilizing a dual-chain approach where the MSR video sequence provides cross-attention guidance, while the individual MSR images are injected directly into the latent space.
-* **Credit:** The dual-chain method implementation is inspired by and based on the technique demonstrated in [this video](https://www.youtube.com/watch?v=uirABckAK4o&).
+* **v0.9.4:** Complete architectural overhaul based on the dual-chain method demonstrated in [this video](https://www.youtube.com/watch?v=uirABckAK4o&). The node now fundamentally separates MSR processing into two isolated streams:
+  1. **Cross-Attention Stream:** MSR images are assembled into a full video sequence (acting like `Licon-MSR`) and processed via IC-LoRA to extract ONLY conditioning metadata. This provides character/style consistency without overwriting physical frames.
+  2. **Latent Injection Stream:** Individual MSR images, alongside the First and Last frames, are injected directly into the physical latent space at their precise indices (index `0` for MSR/First Frame, and the end index for Last Frame) using logic adapted from `LTXVAddGuideMulti`.
 
 A highly optimized, monolithic ComfyUI custom node that integrates **Multi-Subject Reference (MSR)**, **First Frame (FL)**, and **Last Frame (LF)** into a single, high-performance module for LTX-Video.
 
